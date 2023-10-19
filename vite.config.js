@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api": {
+      "/": {
         target: env.VITE_API_ENDPOINT,
         secure: false
       },

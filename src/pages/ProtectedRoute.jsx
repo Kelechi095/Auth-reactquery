@@ -26,7 +26,7 @@ export default function ProtectedRoute({ children }) {
       navigate("/login");
       dispatch(removeUserInfo())
     await customFetch.get("/logout");
-   // queryClient.invalidateQueries();
+   queryClient.invalidateQueries();
 
   };
 

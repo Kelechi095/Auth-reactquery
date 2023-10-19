@@ -13,7 +13,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: "https://kelmauth.onrender.com",
-        secure: false
+        changeOrigin: true
       }
     }
   }

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const customFetch = axios.create({
-    baseURL: "https://kelmauth.onrender.com/api/auth",
+    baseURL: `${import.meta.env.VITE_API_ENDPOINT}/api/auth`,
     withCredentials: true
   });
   

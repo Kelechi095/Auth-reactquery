@@ -9,12 +9,12 @@ const env = loadEnv(
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server: {
+  /* server: {
     proxy: {
       '/api': {
         target: env.VITE_API_ENDPOINT,
         changeOrigin: true
       }
     }
-  }
+  } */
 })

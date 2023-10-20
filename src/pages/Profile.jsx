@@ -8,12 +8,16 @@ const fetchProducts = async () => {
 }
 
 export default function Profile() {
-  const {data: products, isLoading, error} = useQuery("products", fetchProducts)
+  const {data, isLoading, error} = useQuery("products", fetchProducts)
+
+  console.log(data)
   return (
-    <div>{products?.map(product => (
+    <div>{data?.products?.map(product => (
       <div key={product.id}>
         <h4>{product.title}</h4>
       </div>
-    ))}</div>
+    ))}
+    <p>{data?.userx}</p>
+    </div>
   )
 }

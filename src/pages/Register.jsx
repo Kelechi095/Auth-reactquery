@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { customFetch } from "../helpers/customFetch";
-import { QueryClient , useMutation} from "react-query";
 import Oauth from "../components/Oauth";
 import useSetError from "../helpers/useSetError";
+import { useSelector } from "react-redux";
 
 export default function Register() {
   const [formData, setFormData] = useState({});
+  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const navigate = useNavigate();
 
-  const queryClient = new QueryClient();
+
+  const {isLoggedIn} = useSelector(state => state.user)
 
   const handleChange = (e) => {
     setFormData({
@@ -19,26 +22,25 @@ export default function Register() {
     });
   };
 
-  const registerUser = async () => {
-    const response = await customFetch.post("/register", formData);
-    return response.data;
-  };
-
-  const {
-    mutate: registerMutation,
-    isLoading,
-    error,
-  } = useMutation(() => registerUser(), {
-    onSuccess: () => {
-      //queryClient.invalidateQueries("user");
-      navigate("/login");
-    },
-  });
-
   const handleSubmit = async (e) => {
+    setIsLoading(true)
     e.preventDefault();
-    registerMutation();
+    try {
+      await customFetch.post("/register", formData);
+      setIsLoading(false)
+      navigate("/login");
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false)
+      
+    }
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn]);
 
   const { customError } = useSetError(
     error?.response.data?.error.split(" ")[0] === "E11000"
@@ -87,11 +89,7 @@ export default function Register() {
           </span>
         </Link>
       </div>
-      {error && (
-        <p className="text-red-700 mt-5">
-          {customError}
-        </p>
-      )}
+      {error && <p className="text-red-700 mt-5">{customError}</p>}
     </div>
   );
 }

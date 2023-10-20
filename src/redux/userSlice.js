@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+import useRefresh from "../hooks/useRefresh";
 
 const initialState = {
-  currentUser: null
+  token: null,
+  isLoggedIn: false
 };
 
 const userSlice = createSlice({
@@ -9,13 +11,17 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUserInfo: (state, action) => {
-      state.currentUser = action.payload;
+      state.token = action.payload;
     },
     removeUserInfo: (state, action) => {
-      state.currentUser = null
+      state.token = null;
+      state.isLoggedIn = false
+    },
+    setLogin: (state) => {
+      state.isLoggedIn = true
     }
   },
 });
 
-export const {setUserInfo, removeUserInfo} = userSlice.actions;
+export const { setUserInfo, removeUserInfo, setLogin } = userSlice.actions;
 export default userSlice.reducer;

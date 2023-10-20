@@ -1,35 +1,27 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, useNavigate } from "react-router-dom";
-import useGetUser from "../hooks/useGetUser";
+import {useNavigate } from "react-router-dom";
 import { customFetch } from "../helpers/customFetch";
-import { QueryClient } from "react-query";
-import { removeUserInfo } from "../redux/userSlice";
-import {Ring} from '@uiball/loaders'
-
+import { removeUserInfo, setUserInfo } from "../redux/userSlice";
+import { Ring } from "@uiball/loaders";
+import useRefresh from "../hooks/useRefresh";
 
 export default function ProtectedRoute({ children }) {
-  const { currentUser } = useSelector((state) => state.user);
   const [isAuthError, setIsAuthError] = useState(false);
+  const {isLoggedIn} = useSelector(state => state.user)
 
-  const { isLoading } = useGetUser();
+  const {loading } = useRefresh()
 
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-
-  const queryClient = new QueryClient()
-
-  console.log(currentUser)
-
+  const dispatch = useDispatch();
 
   const handleLogout = async () => {
-      navigate("/login");
-      dispatch(removeUserInfo())
+    navigate("/login");
     await customFetch.get("/logout");
-   queryClient.invalidateQueries();
-
+    dispatch(removeUserInfo());
   };
 
+  
   customFetch.interceptors.response.use(
     (response) => {
       return response;
@@ -42,20 +34,16 @@ export default function ProtectedRoute({ children }) {
     }
   );
 
+  console.log(isLoggedIn)
+
+
   useEffect(() => {
     if (!isAuthError) return;
     handleLogout();
+    dispatch(removeUserInfo());
   }, [isAuthError]);
 
-  /* useEffect(() => {
-    if(!currentUser) {
-      navigate('/login')
-    }
-  }, [currentUser])
- */
+  if(loading) return <p>Loading...</p>
 
-
-  if(isLoading) return <Ring size={20}/>
-  
-  return children
+  return children;
 }

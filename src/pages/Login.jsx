@@ -1,38 +1,26 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { QueryClient, useMutation } from "react-query";
 import { customFetch } from "../helpers/customFetch";
 import { useDispatch, useSelector } from "react-redux";
 import { Ring } from "@uiball/loaders";
 import Oauth from "../components/Oauth";
 import useSetError from "../helpers/useSetError";
+import { setUserInfo } from "../redux/userSlice";
+import { removeUserInfo } from "../redux/userSlice";
+import {setLogin} from "../redux/userSlice"
 
 export default function Login() {
+  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
 
-  // const {isLoading: isChecking} = useGetUser()
 
-  const queryClient = new QueryClient();
+  const { isLoggedIn } = useSelector((state) => state.user);
 
-  const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch()
 
-  const loginUser = async () => {
-    const response = await customFetch.post("/login", formData);
-    return response.data;
-  };
-
-  const {
-    mutate: loginMutation,
-    isLoading,
-    error,
-  } = useMutation(() => loginUser(), {
-    onSuccess: () => {
-      // queryClient.invalidateQueries("user");
-      navigate("/");
-    },
-  });
-
+  
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -41,24 +29,41 @@ export default function Login() {
   };
 
   const handleSubmit = async (e) => {
+    setIsLoading(true)
     e.preventDefault();
-    loginMutation();
+    try {
+    const res = await customFetch.post("/login", formData);
+    console.log(res.data)
+    dispatch(setUserInfo(res.data.accessToken))
+    dispatch(setLogin())
+    setIsLoading(false)
+    navigate('/')
+
+    } catch (err) {
+      console.log(err)
+      setError(err)
+      setIsLoading(false)
+    }
   };
 
   useEffect(() => {
-    if (currentUser) {
+    if (isLoggedIn) {
       navigate("/");
     }
-  }, [currentUser]);
+  }, [isLoggedIn]);
 
-  //if(isChecking) return <Ring size={20}/>
+  console.log(isLoggedIn)
 
-  const { customError } = useSetError(
-    error?.response.data?.error?.split(" ")[0] === "E11000"
+
+
+  /* const { customError } = useSetError(
+    error?.response?.data?.error?.split(" ")[0] === "E11000"
       ? "Email already used"
       : error?.response.data?.error
   );
+ */
 
+  
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Login</h1>
@@ -88,7 +93,7 @@ export default function Login() {
           <span className="text-blue-500">Register</span>
         </Link>
       </div>
-      {error && <p className="text-red-700 mt-5">{customError}</p>}
+      {error && <p className="text-red-700 mt-5">{JSON.stringify(error)}</p>}
     </div>
   );
 }

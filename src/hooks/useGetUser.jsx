@@ -1,29 +1,17 @@
-import { useQuery } from "react-query";
-import { useNavigate } from "react-router-dom";
-import { customFetch } from "../helpers/customFetch";
-import { setUserInfo } from "../redux/userSlice";
-
-import { useDispatch } from "react-redux";
-
-const getUser = async () => {
-  const response = await customFetch.get("/user");
-  return response.data;
-};
+import jwtDecode from "jwt-decode";
+import { useSelector } from "react-redux";
 
 export default function useGetUser() {
-  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.user);
 
-  const navigate = useNavigate();
+  let user = null
 
-  const {
-    data: user,
-    isLoading,
-    error,
-  } = useQuery("user", () => getUser(), {
-    onSuccess: (data) => {
-      dispatch(setUserInfo(data));
-    },
-  });
+  if (token) {
+    const decoded = jwtDecode(token);
+    const { username } = decoded.UserInfo;
+    user = username
 
-  return { user, isLoading, error };
+  } 
+
+  return { user};
 }

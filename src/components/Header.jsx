@@ -2,20 +2,18 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { customFetch } from "../helpers/customFetch";
-import { QueryClient } from "react-query";
 import { removeUserInfo } from "../redux/userSlice";
+import useGetUser from "../hooks/useGetUser";
 
 export default function Header() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { user} = useGetUser();
+  
 
   const navigate = useNavigate();
   const dispatch = useDispatch()
 
-  const queryClient = new QueryClient()
-
   const handleLogout = async () => {
     await customFetch.get("/logout");
-    queryClient.invalidateQueries();
     dispatch(removeUserInfo())
     navigate("/login");
   };
@@ -29,7 +27,7 @@ export default function Header() {
         <ul className="flex gap-4">
           <Link to="/">
             <li className="hover:text-blue-500 font-bold">
-              {currentUser?.username}
+              {user}
             </li>
           </Link>
           <Link to="/">

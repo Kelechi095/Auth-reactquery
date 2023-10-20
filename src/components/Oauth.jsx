@@ -2,9 +2,13 @@ import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
 import { app } from "./firebase/firebase";
 import { customFetch } from "../helpers/customFetch";
 import { useNavigate } from "react-router-dom";
+import { setLogin, setUserInfo } from "../redux/userSlice";
+import { useDispatch } from "react-redux";
 
 export default function Oauth() {
   const navigate = useNavigate();
+
+  const dispatch = useDispatch()
 
   const handleGoogleClick = async () => {
     try {
@@ -18,15 +22,9 @@ export default function Oauth() {
       };
       
       const res = await customFetch.post("/google", newUser);
-      /* const res = await fetch("/google", {
-        method: "POST",
-        headers: {
-          'Content-Type': "application/json"
-        },
-        body: JSON.stringify(newUser)
-      }) */
      navigate("/");
-     console.log(res.data)
+     dispatch(setUserInfo(res.data.accessToken))
+     dispatch(setLogin())
     } catch (err) {
       console.log("Could not log in with google", err);
     }

@@ -52,7 +52,6 @@ export default function Login() {
     }
   }, [isLoggedIn]);
 
-  console.log(isLoggedIn)
 
 
 

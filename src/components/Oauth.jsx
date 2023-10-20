@@ -22,9 +22,9 @@ export default function Oauth() {
       };
       
       const res = await customFetch.post("/google", newUser);
-     navigate("/");
-     dispatch(setUserInfo(res.data.accessToken))
-     dispatch(setLogin())
+      dispatch(setUserInfo(res.data.accessToken))
+      dispatch(setLogin())
+      navigate("/");
     } catch (err) {
       console.log("Could not log in with google", err);
     }

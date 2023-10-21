@@ -1,22 +1,33 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { customFetch } from "../helpers/customFetch";
-import { removeUserInfo } from "../redux/userSlice";
 import useGetUser from "../hooks/useGetUser";
+import { useMutation } from "react-query";
 
 export default function Header() {
-  const { user} = useGetUser();
-  
 
   const navigate = useNavigate();
-  const dispatch = useDispatch()
 
-  const handleLogout = async () => {
+  const logoutFn = async () => {
     await customFetch.get("/logout");
-    dispatch(removeUserInfo())
-    navigate("/login");
   };
+
+  const { mutate: logoutMutation} = useMutation(
+    () => logoutFn(),
+    {
+      onSuccess: () => {
+        localStorage.clear()
+        navigate("/login");
+      },
+    }
+  );
+
+  const handleLogout = () => {
+    logoutMutation()
+  }
+
+  const {user} = useGetUser()
+
 
   return (
     <div className="bg-slate-200">

@@ -1,26 +1,21 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { customFetch } from "../helpers/customFetch";
-import { useDispatch, useSelector } from "react-redux";
 import { Ring } from "@uiball/loaders";
 import Oauth from "../components/Oauth";
 import useSetError from "../helpers/useSetError";
-import { setUserInfo } from "../redux/userSlice";
-import { removeUserInfo } from "../redux/userSlice";
-import {setLogin} from "../redux/userSlice"
+import { useMutation, useQueryClient } from "react-query";
+import { saveUserToLocalStorage } from "../helpers/localstorage/saveUser";
+import useIsLoggedIn from "../hooks/useIsLoggedIn";
+
 
 export default function Login() {
-  const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
 
+  const {isLoggedIn} = useIsLoggedIn()
 
-  const { isLoggedIn } = useSelector((state) => state.user);
-
-  const dispatch = useDispatch()
-
-  
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -28,39 +23,38 @@ export default function Login() {
     });
   };
 
-  const handleSubmit = async (e) => {
-    setIsLoading(true)
-    e.preventDefault();
-    try {
+  const loginFn = async () => {
     const res = await customFetch.post("/login", formData);
-    console.log(res.data)
-    dispatch(setUserInfo(res.data.accessToken))
-    dispatch(setLogin())
-    setIsLoading(false)
-    navigate('/')
-
-    } catch (err) {
-      console.log(err)
-      setError(err)
-      setIsLoading(false)
-    }
+    return res.data;
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/");
+  const user = 'user'
+  const token = 'token'
+
+  const { mutate: loginMutation, isLoading } = useMutation(
+    () => loginFn(),
+    {
+      onSuccess: (data) => {
+        saveUserToLocalStorage(user, data.username);
+        saveUserToLocalStorage(token, data.accessToken);
+        navigate("/");
+      },
+      onError: (error) => {
+        error?.response?.data?.error?.split(" ")[0] === "E11000"
+          ? setError("Email already used")
+          : setError(error.response.data.error);
+      },
     }
-  }, [isLoggedIn]);
-
-
-
-
-  /* const { customError } = useSetError(
-    error?.response?.data?.error?.split(" ")[0] === "E11000"
-      ? "Email already used"
-      : error?.response.data?.error
   );
- */
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    loginMutation()
+  }
+
+  useEffect(() => {
+    if(isLoggedIn) navigate('/')
+  }, [isLoggedIn])
 
   
   return (
@@ -92,7 +86,7 @@ export default function Login() {
           <span className="text-blue-500">Register</span>
         </Link>
       </div>
-      {error && <p className="text-red-700 mt-5">{JSON.stringify(error)}</p>}
+      {error && <p className="text-red-700 mt-5">{error}</p>}
     </div>
   );
 }

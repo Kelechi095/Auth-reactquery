@@ -1,27 +1,25 @@
+import { useQuery } from "react-query";
 import { customFetch } from "../helpers/customFetch";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { setUserInfo } from "../redux/userSlice";
+import { saveUserToLocalStorage } from "../helpers/localstorage/saveUser";
 
 export default function useRefresh() {
-    const [loading, setLoading] = useState(false)
-    const dispatch = useDispatch()
 
-  const refreshUser = async () => {
-    setLoading(true)
-    try {
+  const refreshUserFn = async () => {
       const res = await customFetch.get("/refresh");
-      dispatch(setUserInfo(res.data.accessToken));
-      setLoading(false)
-    } catch (err) {
-      console.log(err);
-      setLoading(false)
+      return res.data
+  }
+  const user = 'user'
+  const token = 'token'
+
+
+  const {data, isLoading} = useQuery("users", refreshUserFn, {
+    onSuccess: (data) => {
+      saveUserToLocalStorage(user, data.username);
+      saveUserToLocalStorage(token, data.accessToken);
     }
-  };
+  })
 
-  useEffect(() => {
-    refreshUser();
-  }, []);
-
-  return {loading}
+  
+  return {isLoading}
 }

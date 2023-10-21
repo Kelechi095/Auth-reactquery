@@ -1,17 +1,9 @@
-import jwtDecode from "jwt-decode";
-import { useSelector } from "react-redux";
+import { useState } from "react";
+
 
 export default function useGetUser() {
-  const { token } = useSelector((state) => state.user);
+  const user = localStorage.getItem("user")
 
-  let user = null
-
-  if (token) {
-    const decoded = jwtDecode(token);
-    const { username } = decoded.UserInfo;
-    user = username
-
-  } 
-
+  
   return { user};
 }

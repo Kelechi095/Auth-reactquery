@@ -8,7 +8,6 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./pages/ProtectedRoute";
 
 function App() {
-
   return (
     <BrowserRouter>
       <Routes>
@@ -24,7 +23,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/about" element={<About />} />
         </Route>
-        <Route path="/login" element={<Login/>} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>

@@ -6,7 +6,7 @@ import { saveUserToLocalStorage } from "../helpers/localstorage/saveUser";
 export default function useRefresh() {
 
   const refreshUserFn = async () => {
-      const res = await customFetch.get("/refresh");
+      const res = await customFetch.get("/auth/refresh");
       return res.data
   }
   const user = 'user'

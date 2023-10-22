@@ -24,7 +24,7 @@ export default function Login() {
   };
 
   const loginFn = async () => {
-    const res = await customFetch.post("/login", formData);
+    const res = await customFetch.post("/auth/login", formData);
     return res.data;
   };
 

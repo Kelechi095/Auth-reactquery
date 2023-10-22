@@ -1,32 +1,16 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { customFetch } from "../helpers/customFetch";
+import { Link} from "react-router-dom";
 import useGetUser from "../hooks/useGetUser";
-import { useMutation } from "react-query";
+import useLogoutUser from "../hooks/useLogoutUser";
 
 export default function Header() {
 
-  const navigate = useNavigate();
-
-  const logoutFn = async () => {
-    await customFetch.get("/logout");
-  };
-
-  const { mutate: logoutMutation} = useMutation(
-    () => logoutFn(),
-    {
-      onSuccess: () => {
-        localStorage.clear()
-        navigate("/login");
-      },
-    }
-  );
-
+  const { user } = useGetUser();
+  const {logoutMutation} = useLogoutUser()
+  
   const handleLogout = () => {
-    logoutMutation()
-  }
-
-  const {user} = useGetUser()
+    logoutMutation();
+  };
 
 
   return (
@@ -37,9 +21,7 @@ export default function Header() {
         </Link>
         <ul className="flex gap-4">
           <Link to="/">
-            <li className="hover:text-blue-500 font-bold">
-              {user}
-            </li>
+            <li className="hover:text-blue-500 font-bold">{user}</li>
           </Link>
           <Link to="/">
             <li className="hover:text-blue-500">Home</li>

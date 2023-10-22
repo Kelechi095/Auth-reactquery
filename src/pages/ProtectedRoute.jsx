@@ -1,37 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { customFetch } from "../helpers/customFetch";
 import { Ring } from "@uiball/loaders";
+import useLogoutUser from "../hooks/useLogoutUser";
+import { customFetch } from "../helpers/customFetch";
 import useRefresh from "../hooks/useRefresh";
-import { useMutation } from "react-query";
 
-export default function ProtectedRoute({ children }) {
-  const [isAuthError, setIsAuthError] = useState(false);
+export default function ProtectedRoute({ children}) {
+  const [isAuthError, setIsAuthError] = useState(false)
 
-  useRefresh()
+  const {isLoading } = useRefresh()
 
-  const { loading } = useRefresh();
+  const { logoutMutation } = useLogoutUser();
 
-  const navigate = useNavigate();
-
-  const logoutFn = async () => {
-    await customFetch.get("/logout");
-  };
-
-  const { mutate: logoutMutation} = useMutation(
-    () => logoutFn(),
-    {
-      onSuccess: () => {
-        localStorage.clear()
-        navigate("/login");
-      },
-    }
-  );
-
-  const handleLogout = (e) => {
-    logoutMutation()
-  }
-  
 
   customFetch.interceptors.response.use(
     (response) => {
@@ -45,12 +24,21 @@ export default function ProtectedRoute({ children }) {
     }
   );
 
+  const handleLogout = (e) => {
+    logoutMutation();
+  };
+
   useEffect(() => {
     if (!isAuthError) return;
     handleLogout();
   }, [isAuthError]);
 
-  if (loading) return <p>Loading...</p>;
+  if (isLoading)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <Ring size={40}/>;
+      </div>
+    );
 
   return children;
 }

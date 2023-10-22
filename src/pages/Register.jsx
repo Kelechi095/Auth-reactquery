@@ -24,7 +24,7 @@ export default function Register() {
   };
 
   const registerFn = async () => {
-    const res = await customFetch.post("/register", formData);
+    const res = await customFetch.post("/auth/register", formData);
     return res.data;
   };
 

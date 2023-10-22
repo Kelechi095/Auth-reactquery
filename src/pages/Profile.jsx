@@ -12,7 +12,7 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const getUserProfileFn = async () => {
-    const res = await customFetch.get("/profile");
+    const res = await customFetch.get("/auth/profile");
     return res.data;
   };
 
@@ -23,7 +23,7 @@ export default function Profile() {
   });
 
   const updateProfileFn = async () => {
-    const res = await customFetch.patch("/update", { newUsername });
+    const res = await customFetch.patch("/auth/update", { newUsername });
     return res.data;
   };
 

@@ -18,7 +18,7 @@ export default function Oauth() {
       photo: result.user.photoURL,
     };
 
-    const res = await customFetch.post("/google", newUser);
+    const res = await customFetch.post("/auth/google", newUser);
     return res.data;
   };
 

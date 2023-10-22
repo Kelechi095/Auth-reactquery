@@ -1,5 +1,5 @@
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
-import { app } from "./firebase/firebase";
+import { app } from "../helpers/firebase/firebase";
 import { customFetch } from "../helpers/customFetch";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";

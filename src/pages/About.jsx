@@ -6,6 +6,8 @@ import { customFetch } from "../helpers/customFetch";
 export default function About() {
   const [file, setFile] = useState("");
   const [previewFile, setPreviewFile] = useState("");
+  const [isUploaded, setIsUploaded] = useState("");
+  const [isDone, setIsDone] = useState(true)
   const fileRef = useRef(null);
 
   const queryClient = useQueryClient();
@@ -16,42 +18,56 @@ export default function About() {
   };
 
   const uploadPhoto = async () => {
-    const res = await customFetch.post("/user/create-photo", {file });
+    const res = await customFetch.post("/user/create-photo", { file });
     return res.data;
   };
 
   const handleImageChange = (e) => {
     const newFile = e.target.files[0];
-    console.log(e.target.files[0])
-    setPreviewFile(URL.createObjectURL(e.target.files[0]));
 
     const reader = new FileReader();
 
     reader.readAsDataURL(newFile);
+    setPreviewFile(URL.createObjectURL(e.target.files[0]));
+    setIsDone(false)
     reader.onload = () => {
-      setFile(reader.result.slice(8));
+      console.log(reader.result);
+      setFile(reader.result);
     };
   };
 
   const { data } = useQuery("aboutPhoto", getPhoto);
 
-  const { mutate: uploadPhotoMutation, isLoading } = useMutation(() => uploadPhoto(), {
-    onSuccess: () => {
-      queryClient.invalidateQueries("aboutPhoto");
-    },
-  });
+  const { mutate: uploadPhotoMutation, isLoading } = useMutation(
+    () => uploadPhoto(),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("aboutPhoto");
+        setIsUploaded("Upload successful");
+        setTimeout(() => {
+          setIsUploaded("");
+        }, 3000);
+        setIsDone(true)
+      },
+      onError: () => {
+        setIsUploaded("Upload failed");
+        setTimeout(() => {
+          setIsUploaded("");
+        }, 3000);
+      },
+    }
+  );
 
   const handleUploadPhoto = (e) => {
     e.preventDefault();
     uploadPhotoMutation();
-    //setFile("");
-    //setPreviewFile("")
   };
 
-  console.log(file)
+  console.log(previewFile);
 
   return (
     <div className="flex flex-col">
+      <p>{isUploaded}</p>
       <form>
         <input
           type="file"
@@ -67,12 +83,12 @@ export default function About() {
         alt=""
         onClick={() => fileRef.current.click()}
       />
-      {file && (
+      {!isDone && (
         <button
           className="bg-slate-700 text-white w-20 rounded-sm m-3 p-1"
           onClick={handleUploadPhoto}
         >
-          {isLoading ? "Uploading" : 'Upload'}
+          {isLoading ? "Uploading" : "Upload"}
         </button>
       )}
     </div>

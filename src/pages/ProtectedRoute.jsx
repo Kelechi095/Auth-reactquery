@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Ring } from "@uiball/loaders";
 import useLogoutUser from "../hooks/useLogoutUser";
 import { customFetch } from "../helpers/customFetch";
 import useRefresh from "../hooks/useRefresh";
+import Loader from "../components/Loader";
 
 export default function ProtectedRoute({ children}) {
   const [isAuthError, setIsAuthError] = useState(false)
@@ -34,11 +34,7 @@ export default function ProtectedRoute({ children}) {
   }, [isAuthError]);
 
   if (isLoading)
-    return (
-      <div className="h-screen flex justify-center items-center">
-        <Ring size={40}/>;
-      </div>
-    );
+    return <Loader />
 
   return children;
 }
